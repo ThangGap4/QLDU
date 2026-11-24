@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: bds-online-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: python seed.py; uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: DATABASE_URL
+        fromDatabase:
+          name: bds-online-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: ADMIN_EMAIL
+        value: admin@bds.local
+      - key: ADMIN_PASSWORD
+        sync: false
+
+databases:
+  - name: bds-online-db
+    plan: free
+    databaseName: bds_online
+    user: bds
